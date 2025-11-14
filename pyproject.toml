@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "sac-mujoco-humanoid"
+version = "0.1.0"
+description = ""
+authors = ["Giansimone Perrino <hello@giansimone.dev>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.13,<3.14"
+pyyaml = "^6.0.3"
+huggingface-hub = "^1.1.2"
+imageio = {extras = ["ffmeg"], version = "^2.37.2"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
