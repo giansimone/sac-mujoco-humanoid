@@ -36,6 +36,7 @@ class ReplayBuffer:
         next_state: torch.Tensor,
         done: torch.Tensor,
     ):
+        """Add a new experience to the replay buffer."""
         self.state[self.ptr] = state
         self.action[self.ptr] = action
         self.reward[self.ptr] = reward
@@ -46,6 +47,7 @@ class ReplayBuffer:
         self.size = min(self.size + 1, self.capacity)
 
     def sample(self, batch_size: int) -> Tuple:
+        """Sample a batch of experiences from the replay buffer."""
         batch_idx = torch.randint(0, self.size, size=(batch_size,))
 
         state = self.state[batch_idx]
