@@ -35,8 +35,8 @@ class Actor(nn.Module):
         self.mean_head = nn.Linear(hidden_dim, action_dim)
         self.log_std_head = nn.Linear(hidden_dim, action_dim)
 
-        self.action_scale = action_scale
-        self.action_bias = action_bias
+        self.register_buffer("action_scale", action_scale)
+        self.register_buffer("action_bias", action_bias)
 
     def forward(self, state: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """Forward pass through the Actor network."""

@@ -18,11 +18,11 @@ class ReplayBuffer:
     ):
         self.device = device
 
-        self.state = torch.zeros((capacity, state_dim)).to(self.device)
-        self.action = torch.zeros((capacity, action_dim)).to(self.device)
-        self.reward = torch.zeros((capacity, 1)).to(self.device)
-        self.next_state = torch.zeros((capacity, state_dim)).to(self.device)
-        self.done = torch.zeros((capacity, 1), dtype=torch.int64).to(self.device)
+        self.state = torch.zeros((capacity, state_dim))
+        self.action = torch.zeros((capacity, action_dim))
+        self.reward = torch.zeros((capacity, 1))
+        self.next_state = torch.zeros((capacity, state_dim))
+        self.done = torch.zeros((capacity, 1), dtype=torch.int64)
 
         self.ptr = 0
         self.size = 0
@@ -50,10 +50,10 @@ class ReplayBuffer:
         """Sample a batch of experiences from the replay buffer."""
         batch_idx = torch.randint(0, self.size, size=(batch_size,))
 
-        state = self.state[batch_idx]
-        action = self.action[batch_idx]
-        reward = self.reward[batch_idx]
-        next_state = self.next_state[batch_idx]
-        done = self.done[batch_idx]
+        state = self.state[batch_idx].to(self.device)
+        action = self.action[batch_idx].to(self.device)
+        reward = self.reward[batch_idx].to(self.device)
+        next_state = self.next_state[batch_idx].to(self.device)
+        done = self.done[batch_idx].to(self.device)
 
         return (state, action, reward, next_state, done)

@@ -8,16 +8,15 @@ import torch
 
 from agent import SAC 
 from environment import make_env
-from utils import set_seed, load_config, save_config, get_device
-
-SAVE_N_STEPS = 50_000
+from utils import set_seed, load_config, save_config
 
 
-def train(config_filename: Path = Path("config.yaml")):
+def train(config_filename: Path = Path("config.yaml"), device_id: str = "cpu"):
     """Train the SAC agent in the MuJoCo Humanoid environment."""
     config = load_config(config_filename)
+    device = torch.device(device_id)
+
     set_seed(config["seed"])
-    device = get_device()
 
     run_name = "sac_" + config["env_name"] + "_" + datetime.now().strftime("%Y-%m-%d_%Hh%Mm%Ss")
 
@@ -54,7 +53,6 @@ def train(config_filename: Path = Path("config.yaml")):
 
     state, _ = env.reset(seed=config["seed"])
     episode_reward = 0.
-    episode_steps = 0
 
     for step in range(config["total_steps"]):
         if step < config["start_steps"]:
@@ -70,26 +68,21 @@ def train(config_filename: Path = Path("config.yaml")):
         agent.memory.push(
             torch.tensor(state, dtype=torch.float32),
             torch.tensor(action, dtype=torch.float32),
-            torch.tensor(float(reward), dtype=torch.float32),
+            torch.tensor(float(reward), dtype=torch.float32).view(1),
             torch.tensor(next_state, dtype=torch.float32),
-            torch.tensor(terminated, dtype=torch.int64),
+            torch.tensor(terminated, dtype=torch.int64).view(1),
         )
 
         state = next_state
         episode_reward += float(reward)
-        episode_steps += 1
 
         if step >= config["start_steps"]:
             agent.learn()
-
-            if step % SAVE_N_STEPS == 0:
-                agent.save_model(run_dir / "model.pt")
 
         if done:
             print(f"Step: {step}, Reward: {episode_reward:.2f}, Alpha: {agent.alpha:.4f}")
             state, _ = env.reset()
             episode_reward = 0
-            episode_steps = 0
 
     agent.save_model(run_dir / "final_model.pt")
 

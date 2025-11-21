@@ -22,15 +22,6 @@ def set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def get_device() -> torch.device:
-    """Get the available device (CPU, CUDA, or MPS)."""
-    if torch.cuda.is_available():
-        return torch.device("cuda")
-    if torch.backends.mps.is_available():
-        return torch.device("mps")
-    return torch.device("cpu")
-
-
 def load_config(filepath: Path) -> dict:
     """Load the YAML configuration file into a standard Python dictionary."""
     with open(filepath, "r", encoding="utf-8") as f:
@@ -53,7 +44,8 @@ def record_movie(env: gym.Env, agent: SAC, filepath: Path, fps: int):
     images.append(img)
 
     while not done:
-        action = agent.select_action(state, deterministic=True)
+        action_tensor = agent.select_action(state, deterministic=True)
+        action = action_tensor.cpu().numpy().flatten()
 
         next_state, _, terminated, truncated, _ = env.step(action)
         done = terminated or truncated
