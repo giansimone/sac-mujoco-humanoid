@@ -6,24 +6,35 @@ A PyTorch implementation of the Soft Actor-Critic (SAC) algorithm to train an ag
 
 ## Installation
 
-You can clone the repository and install the required dependencies using Poetry or pip. 
+You can clone the repository and install the required dependencies using Poetry or pip. This project requires **Python 3.13**.
 
-Using Poetry:
+### Using Poetry (Recommended)
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/giansimone/sac-mujoco-humanoid.git
 cd sac-mujoco-humanoid
-eval $(poetry env activate)
+
+# 2. Initialize environment and install dependencies
+poetry env use python3.13
 poetry install
+
+# 3. Activate the shell
+eval $(poetry env activate)
 ```
 
-Alternatively, you can clone the repository and install the dependencies locally using pip:
+### Using Pip
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/giansimone/sac-mujoco-humanoid.git
 cd sac-mujoco-humanoid
-python -m venv venv
+
+# 2. Create and activate virtual environment
+python3.13 -m venv venv
 source venv/bin/activate
+
+# 3. Install package in editable mode
 pip install -e .
 ```
 
@@ -33,14 +44,14 @@ pip install -e .
 sac-mujoco-humanoid/
 ├── sac_mujoco_humanoid/
 │   ├── __init__.py
-│   ├── agent.py
-│   ├── buffer.py
-│   ├── config.yaml
-│   ├── enjoy.yaml
-│   ├── environment.py
-│   ├── export.py
-│   ├── model.py
-│   ├── train.py
+│   ├── agent.py       # SAC implementation (Actor/Critic)
+│   ├── buffer.py      # Replay Buffer
+│   ├── config.yaml    # Training hyperparameters
+│   ├── environment.py # Gym environment wrappers
+│   ├── enjoy.py       # Evaluation script
+│   ├── export.py      # Hugging Face export script
+│   ├── model.py       # PyTorch Network definitions
+│   ├── train.py       # Main training loop
 │   └── utils.py
 ├── .gitignore
 ├── LICENSE
@@ -48,9 +59,9 @@ sac-mujoco-humanoid/
 └── pyproject.toml
 ```
 
-## Quick Start
+## Usage
 
-Once you have installed the dependencies, you can start training the SAC agent. Change directory to the project root and run the training script.
+Ensure you are in the ```sac_mujoco_humanoid``` source directory where ```config.yaml``` is located before running these commands.
 
 ```bash
 cd sac-mujoco-humanoid
@@ -58,7 +69,9 @@ cd sac-mujoco-humanoid
 
 ### Training
 
-Train a SAC agent with the default configuration:
+Train a SAC agent with the default configuration.
+
+**Note:** The Replay Buffer pre-allocates memory. Ensure your system has at least 8GB of RAM available.
 
 ```bash
 python -m train
@@ -66,7 +79,7 @@ python -m train
 
 ### Configuration
 
-Edit ```config.yaml``` to customise training parameters such as learning rate, number of episodes, and more.
+Edit ```config.yaml``` to customise training parameters.
 
 ```yaml
 #Environment
@@ -98,31 +111,33 @@ seed: 42
 
 ### Enjoying a Trained Agent
 
-Watch a trained agent by running the enjoy script:
+Watch a trained agent by running the enjoy script. Point the artifact argument to your saved model file.
 
 ```bash
 python -m enjoy \
-    --artifact-path runs/sac_YYYY-MM-DD_HHhMMmSSs/final_model.pt \
-    --num-episodes 1
+    --artifact runs/sac_Humanoid-v5_YYYY-MM-DD_HHhMMmSSs/final_model.pt \
+    --num-episodes 5
 ```
 ### Exporting to Hugging Face Hub
 
-Share your trained model on the Hugging Face Hub:
+Share your trained model, config, and a replay video to the Hugging Face Hub.
 
 ```bash
 python -m export \
     --username YOUR_HF_USERNAME \
     --repo-name sac-mujoco-humanoid \
-    --artifact-path runs/sac_YYYY-MM-DD_HHhMMmSSs/final_model.pt \
-    --movie-fps 30 
+    --artifact-path runs/sac_Humanoid-v5_YYYY-MM-DD_HHhMMmSSs/final_model.pt \
+    --movie-fps 30 \
+    --n-eval 10
 ```
 
-This will:
+This will automatically:
 
-- Create a repository on Hugging Face Hub.
-- Upload the model weights, configuration, and evaluation results.
-- Generate and upload a replay movie.
-- Create a model card with usage instructions.
+- Upload the model weights and config.
+
+- Generate a model card with evaluation metrics (Mean Reward +/- Std).
+
+- Record and upload a video of the agent.
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
